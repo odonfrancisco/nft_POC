@@ -11,7 +11,8 @@ contract VotingContract {
   
   event TokenCreated (
     uint tokenId,
-    address owner
+    address owner,
+    string contractAddr
   );
 
   struct AccessRef {
@@ -51,6 +52,7 @@ contract VotingContract {
     approvedTokens[tokenId] = ar;
     tokenOwners[msg.sender] = ar;    
     adminExists = true;
+    emit TokenCreated(tokenId, msg.sender, accessToken.tokenURI(tokenId));
   }
 
   function generateAccessToken(address approved, string memory contractAddr) external onlyAdmin() {
@@ -64,13 +66,13 @@ contract VotingContract {
     );
     approvedTokens[tokenId] = ar;
     tokenOwners[approved] = ar;
-    emit TokenCreated(tokenId, approved);
+    emit TokenCreated(tokenId, approved, accessToken.tokenURI(tokenId));
   }
 
   function vote() external onlyApproved() {
-    uint ownerIndex = accessToken.tokenOfOwnerByIndex(msg.sender, 0);
+    uint tokenId = accessToken.tokenOfOwnerByIndex(msg.sender, 0);
     emit ContractAccessed(
-      ownerIndex,
+      tokenId,
       msg.sender
     );
   }
